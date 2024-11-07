@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            Text("BookHub").bold()
+            Text("This is Development Environment").bold()
         }
         .padding()
     }
