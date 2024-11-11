@@ -14,7 +14,7 @@ struct SignupView: View {
     @State var repassword: String = ""
     
     var body: some View {
-        NavigationView{
+
             ZStack{
                 //Background Color
                 Color.white
@@ -87,22 +87,11 @@ struct SignupView: View {
                     
                     Spacer()
                     
-                    //Login
-                    Button{
-                        print("TODO: Back to login")
-                    } label: {
-                        Text("Already have an account? Signin")
-                            .frame(maxWidth: .infinity)
-                            .font(.subheadline)
-                            .foregroundColor(.blue)
-                    }
-                    .padding()
                 }
-                
             }
             
             //.navigationTitle("Signup")
-        }
+      
     }
 }
 

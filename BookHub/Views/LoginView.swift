@@ -9,9 +9,19 @@ struct LoginView: View {
     @State var email: String = ""
     @State var password: String = ""
     
+    @State var showSignupView: Bool = false
+    @State var showForgotPasswordView: Bool = false
+    
     var body: some View {
         NavigationView{
             ZStack{
+                
+                //Links to the Signup view
+                NavigationLink(destination: SignupView(), isActive: $showSignupView, label: { EmptyView() })
+                
+                //Links to the Reset Password view
+                NavigationLink(destination: ForgotPasswordView(), isActive: $showForgotPasswordView, label: { EmptyView() })
+                
                 //Background Color
                 Color.white
                     .ignoresSafeArea(edges: .all)
@@ -52,7 +62,8 @@ struct LoginView: View {
                         
                         //Forgot Password Button
                         Button{
-                            print("TODO: Forgot Password")
+                            //print("TODO: Forgot Password")
+                            self.showForgotPasswordView = true
                         } label: {
                             Text("Forgot Password")
                                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -79,7 +90,8 @@ struct LoginView: View {
                         
                         //Create Account Button
                         Button{
-                            print("TODO: Create account")
+                            //print("TODO: Create account")
+                            self.showSignupView = true
                         } label: {
                             Text("Create Account")
                                 .frame(maxWidth: .infinity)
@@ -115,7 +127,7 @@ struct LoginView: View {
                     Button{
                         print("TODO: Face Authentication")
                     } label: {
-                        Text("Face Authnetication")
+                        Text("Face Authentication")
                             .frame(maxWidth: .infinity)
                             .font(.subheadline)
                             .foregroundColor(.blue)

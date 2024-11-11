@@ -11,8 +11,10 @@ struct ForgotPasswordView: View {
     var body: some View {
         @State var email: String = ""
         
-        NavigationView{
+        @State var showLoginView: Bool = false
+        
             ZStack{
+                
                 //Background Color
                 Color.white
                     .ignoresSafeArea(edges: .all)
@@ -62,23 +64,11 @@ struct ForgotPasswordView: View {
                     .padding()
                     
                     Spacer()
-                    
-                    //Login
-                    Button{
-                        print("TODO: Back to login")
-                    } label: {
-                        Text("Already have an account? Signin")
-                            .frame(maxWidth: .infinity)
-                            .font(.subheadline)
-                            .foregroundColor(.blue)
-                    }
-                    .padding()
                 }
                 
             }
             
             //.navigationTitle("Forgot Password")
-        }
     }
 }
 
