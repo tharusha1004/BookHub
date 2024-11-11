@@ -25,7 +25,7 @@ struct ForgotPasswordView: View {
                         .frame(width: 150, height: 150)
                     
                     //Signup Text
-                    Text("Create an Account")
+                    Text("Forgot Password")
                         .font(.title)
                         .fontWeight(.bold)
                     
@@ -50,7 +50,7 @@ struct ForgotPasswordView: View {
                             print("email:\(email)")
                             
                         } label: {
-                            Text("Create Account")
+                            Text("Reset Password")
                                 .frame(maxWidth: .infinity)
                                 .font(.title3.bold())
                         }
