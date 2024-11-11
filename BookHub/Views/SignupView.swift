@@ -70,7 +70,9 @@ struct SignupView: View {
                         
                         //Create Account Button
                         Button{
-                            print("TODO: Create account")
+                            print("email:\(email)")
+                            print("password:\(password)")
+                            print("password:\(repassword)")
                         } label: {
                             Text("Create Account")
                                 .frame(maxWidth: .infinity)
@@ -85,28 +87,11 @@ struct SignupView: View {
                     
                     Spacer()
                     
-                    //Other Options
-                    VStack(spacing: 8){
-                        //Sign in with Apple Button
-                        Button{
-                            print("TODO: Signin with Apple")
-                        } label: {
-                            Label("Sign in with Apple", systemImage: "applelogo")
-                                .frame(maxWidth: .infinity)
-                                .font(.title3.bold())
-                        }
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.black)
-                        .cornerRadius(14)
-                    }
-                    .padding()
-                
-                    //Face Authentication
+                    //Login
                     Button{
-                        print("TODO: Face Authentication")
+                        print("TODO: Back to login")
                     } label: {
-                        Text("Face Authnetication")
+                        Text("Already have an account? Signin")
                             .frame(maxWidth: .infinity)
                             .font(.subheadline)
                             .foregroundColor(.blue)
@@ -116,7 +101,7 @@ struct SignupView: View {
                 
             }
             
-            //.navigationTitle("Login")
+            //.navigationTitle("Signup")
         }
     }
 }
