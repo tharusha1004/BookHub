@@ -8,14 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var isUserCurrentlyLoggedOut: Bool = false
+    
     var body: some View {
-        VStack {
-            Text("This is authentication").bold()
+        NavigationView{
+            if self.isUserCurrentlyLoggedOut{
+                HomeView()
+            }else{
+                LoginRegisterView()
+            }
         }
-        .padding()
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider{
+    static var previews: some View {
+        ContentView()
+    }
 }
