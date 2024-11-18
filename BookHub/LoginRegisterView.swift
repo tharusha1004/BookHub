@@ -66,6 +66,29 @@ struct LoginRegisterView: View {
                         .scaledToFit()
                         .frame(width: 128, height: 128)
                         .cornerRadius(64)
+                    
+                    Group{
+                        TextField("Email", text: $email)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                        SecureField("Password", text: $password)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    
+                    Button{
+                        loginUser()
+                    } label: {
+                        HStack{
+                            Spacer()
+                            Text("Login")
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10)
+                                .font(.system(size: 18, weight: .semibold))
+                            Spacer()
+                        }.background(Color.green)
+                    }.cornerRadius(10)
                 }
             }.padding()
         }
@@ -73,6 +96,10 @@ struct LoginRegisterView: View {
         .background(
             LinearGradient(gradient: Gradient(colors: [.blue, .red]), startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
         )
+    }
+    
+    private func loginUser(){
+        
     }
 }
 
