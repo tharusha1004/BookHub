@@ -9,6 +9,8 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 
+import LocalAuthentication
+
 struct LoginRegisterView: View {
     
     @State var isLoginMode = false
@@ -21,27 +23,39 @@ struct LoginRegisterView: View {
     @State var StatusMessage = ""
     
     @Binding var isUserCurrentlyLoggedOut: Bool
+    @Binding var isAuthenticated: Bool
+    
+    @State private var alertMessage = ""
     
     var body: some View {
         ScrollView{
             
-            VStack(spacing: 16){
+            VStack{
+                
+                //Logo
+                Text("BookHub")
+                    .font(.system(size:40))
+                    .fontWeight(.bold)
+                    .foregroundColor(Color.blue)
+                    .padding(.bottom, 20)
+                
+                //Subheading
+                Text("- User Authentication -")
+                    .font(.subheadline)
+                    .foregroundColor(Color.black)
+                    .padding(.bottom, 20)
+                
+                
                 Picker(selection: $isLoginMode, label: Text("Picker Here")){
                     Text("Login")
                         .tag(true)
                     Text("Create Account")
                         .tag(false)
-                }.pickerStyle(SegmentedPickerStyle())
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.bottom, 20)
                 
                 if !isLoginMode{
-                    //Text("Register")
-                    VStack{
-                        Image(systemName: "person.fill")
-                            .font(.system(size:32))
-                            .padding()
-                            .foregroundColor(Color(.label))
-                    }
-                    .overlay(RoundedRectangle(cornerRadius: 32).stroke(Color.black, lineWidth: 3))
                     
                     Group{
                         TextField("First Name", text: $fname)
@@ -52,8 +66,9 @@ struct LoginRegisterView: View {
                         SecureField("Password", text: $password)
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(Color(.systemGray6))
                     .cornerRadius(10)
+                    .foregroundColor(.black)
                     
                     Button{
                         handleAction()
@@ -67,12 +82,9 @@ struct LoginRegisterView: View {
                             Spacer()
                         }.background(Color.blue)
                     }.cornerRadius(10)
-                }else{
-                    Image("Login")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 128, height: 128)
-                        .cornerRadius(64)
+                }
+                
+                else{
                     
                     Group{
                         TextField("Email", text: $email)
@@ -81,8 +93,20 @@ struct LoginRegisterView: View {
                         SecureField("Password", text: $password)
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(Color(.systemGray6))
                     .cornerRadius(10)
+                    .foregroundColor(.black)
+                    
+                    HStack{
+                        Spacer()
+                        Button{
+                            print("Forgot Password")
+                        } label: {
+                            Text("Forgot Password")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .padding(.bottom, 20)
                     
                     Button{
                         loginUser()
@@ -94,22 +118,76 @@ struct LoginRegisterView: View {
                                 .padding(.vertical, 10)
                                 .font(.system(size: 18, weight: .semibold))
                             Spacer()
-                        }.background(Color.green)
-                    }.cornerRadius(10)
-                        .alert(isPresented: $shouldShowLoginAlert){
-                            Alert(title: Text("Email / Password Incorrect"))
                         }
+                        .background(Color.blue)
+                    }
+                    .cornerRadius(10)
+                    .alert(isPresented: $shouldShowLoginAlert){
+                        Alert(title: Text("Email / Password Incorrect"))
+                    }
+                    
+                    // Sign-in with Google, Facebook, and Apple
+                    VStack(spacing: 12) {
+                        Button {
+                            print("Sign in with Google")
+                        }label: {
+                            HStack {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 20))
+                                Text("Sign in with Google")
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black)
+                            .cornerRadius(10)
+                        }
+                        
+                        Button{
+                            print("Sign in with Apple")
+                        }label: {
+                            HStack {
+                                Image(systemName: "applelogo")
+                                    .font(.system(size: 20))
+                                Text("Sign in with Apple")
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.black)
+                            .cornerRadius(10)
+                        }
+                    }
+                    .padding(.top, 20)
+                    .padding(.bottom, 20)
+                    
+                    VStack(spacing: 18) {
+                        Button {
+                            authenticate()
+                        }label: {
+                            HStack {
+                                Text("Face ID")
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                            .foregroundColor(.blue)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .padding(.top, 50)
+                    
                 }
                 
-                Text(self.StatusMessage)
-                    .foregroundColor(Color.white)
+                //Text(self.StatusMessage)
+                    //.foregroundColor(Color.red)
                 
             }.padding()
         }
         .navigationViewStyle(StackNavigationViewStyle())
-        .background(
-            LinearGradient(gradient: Gradient(colors: [.blue, .red]), startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
-        )
+        .background(Color.white.edgesIgnoringSafeArea(.all))
+
     }
     
     private func loginUser(){
@@ -126,44 +204,75 @@ struct LoginRegisterView: View {
         }
     }
     
-    private func handleAction(){
-        createAccount()
+    private func handleAction() {
+        createNewAccount()
     }
-    
-    private func createAccount(){
-        Auth.auth().createUser(withEmail: email, password: password){ result, err in
-            if let err = err{
-                print("Failed to create user", err)
+      
+    private func createNewAccount() {
+        Auth.auth().createUser(withEmail: email, password: password) { result, err in
+            if let err = err {
+                print("Failed to create user:", err)
                 self.StatusMessage = "Failed to create user: \(err)"
                 return
             }
+             
             print("Successfully created user: \(result?.user.uid ?? "")")
+   
             self.StatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
-            
+             
             self.storeUserInformation()
         }
     }
-    
-    private func storeUserInformation(){
-        guard let uid = Auth.auth().currentUser?.uid else{
-            return
-        }
-        let userData = ["fname": self.fname, "lname":self.lname, "email": self.email, "profileImageUrl": "profileurl", "uid": uid]
-        Firestore.firestore().collection("users").document(uid).setData(userData){ err in
-            if let err = err{
-                print(err)
-                self.StatusMessage = "\(err)"
-                return
+     
+    private func storeUserInformation() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let userData = ["fname": self.fname, "lname": self.lname, "email": self.email, "profileImageUrl": "profileurl", "uid": uid]
+        Firestore.firestore().collection("users")
+            .document(uid).setData(userData) { err in
+                if let err = err {
+                    print(err)
+                    self.StatusMessage = "\(err)"
+                    return
+                }
+  
+                print("Success")
             }
-            print("Success")
-            
+    }
+    
+    private func authenticate(){
+        let context = LAContext()
+        var error: NSError?
+        
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Authenticate with Face ID") { success, error in
+                if success {
+                    print("Authentication successful")
+                      DispatchQueue.main.async {
+                         self.alertMessage = "Authentication successful"
+                         self.isAuthenticated = true
+                      }
+                } else {
+                    print("Authentication Failed")
+                       DispatchQueue.main.async {
+                          self.alertMessage = "Authentication Failed"
+                       }
+                }
+            }
+        }
+        else{
+            print("Your device does not support Face ID")
+            DispatchQueue.main.async {
+                self.alertMessage = "Your device does not support Face ID"
+            }
         }
     }
 }
 
 struct LoginRegisterView_Previews: PreviewProvider{
     @State static var isUserCurrentlyLoggedOut = false
+    @State static var isAuthenticated = false
     static var previews: some View{
-        LoginRegisterView(isUserCurrentlyLoggedOut: $isUserCurrentlyLoggedOut)
+        LoginRegisterView(isUserCurrentlyLoggedOut: $isUserCurrentlyLoggedOut, isAuthenticated: $isAuthenticated)
     }
 }
+
