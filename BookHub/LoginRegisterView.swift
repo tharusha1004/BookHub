@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseAuth
 
 struct LoginRegisterView: View {
     
@@ -14,6 +16,11 @@ struct LoginRegisterView: View {
     @State var lname = ""
     @State var email = ""
     @State var password = ""
+    
+    @State private var shouldShowLoginAlert: Bool = false
+    @State var StatusMessage = ""
+    
+    @Binding var isUserCurrentlyLoggedOut: Bool
     
     var body: some View {
         ScrollView{
@@ -49,7 +56,7 @@ struct LoginRegisterView: View {
                     .cornerRadius(10)
                     
                     Button{
-                        
+                        handleAction()
                     }label: {
                         HStack{
                             Spacer()
@@ -89,7 +96,14 @@ struct LoginRegisterView: View {
                             Spacer()
                         }.background(Color.green)
                     }.cornerRadius(10)
+                        .alert(isPresented: $shouldShowLoginAlert){
+                            Alert(title: Text("Email / Password Incorrect"))
+                        }
                 }
+                
+                Text(self.StatusMessage)
+                    .foregroundColor(Color.white)
+                
             }.padding()
         }
         .navigationViewStyle(StackNavigationViewStyle())
@@ -99,12 +113,57 @@ struct LoginRegisterView: View {
     }
     
     private func loginUser(){
-        
+        Auth.auth().signIn(withEmail: email, password: password){ result, err in
+            if let err = err{
+                print("Failed to login", err)
+                self.StatusMessage = "Failed to login user: \(err)"
+                self.shouldShowLoginAlert = true
+                return
+            }
+            print("Successfully logged in as user: \(result?.user.uid ?? "")")
+            self.StatusMessage = "Successfully logged in as user: \(result?.user.uid ?? "")"
+            self.isUserCurrentlyLoggedOut = true
+        }
+    }
+    
+    private func handleAction(){
+        createAccount()
+    }
+    
+    private func createAccount(){
+        Auth.auth().createUser(withEmail: email, password: password){ result, err in
+            if let err = err{
+                print("Failed to create user", err)
+                self.StatusMessage = "Failed to create user: \(err)"
+                return
+            }
+            print("Successfully created user: \(result?.user.uid ?? "")")
+            self.StatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
+            
+            self.storeUserInformation()
+        }
+    }
+    
+    private func storeUserInformation(){
+        guard let uid = Auth.auth().currentUser?.uid else{
+            return
+        }
+        let userData = ["fname": self.fname, "lname":self.lname, "email": self.email, "profileImageUrl": "profileurl", "uid": uid]
+        Firestore.firestore().collection("users").document(uid).setData(userData){ err in
+            if let err = err{
+                print(err)
+                self.StatusMessage = "\(err)"
+                return
+            }
+            print("Success")
+            
+        }
     }
 }
 
 struct LoginRegisterView_Previews: PreviewProvider{
+    @State static var isUserCurrentlyLoggedOut = false
     static var previews: some View{
-        LoginRegisterView()
+        LoginRegisterView(isUserCurrentlyLoggedOut: $isUserCurrentlyLoggedOut)
     }
 }

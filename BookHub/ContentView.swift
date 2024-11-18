@@ -16,7 +16,7 @@ struct ContentView: View {
             if self.isUserCurrentlyLoggedOut{
                 HomeView()
             }else{
-                LoginRegisterView()
+                LoginRegisterView(isUserCurrentlyLoggedOut: $isUserCurrentlyLoggedOut)
             }
         }
     }
