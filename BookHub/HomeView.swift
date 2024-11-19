@@ -8,14 +8,22 @@
 import SwiftUI
 
 struct HomeView: View {
+    
+    @State private var selectedTab: Tab = .all
     var body: some View {
-        Text("Home")
+        NavigationStack {
+            ScrollView{
+                VStack{
+                    MostReadView()
+                    SegmentedControl(selectedTab: $selectedTab)
+                    BookView(selectedTab: $selectedTab)
+                }
+            }
+        }
     }
 }
 
-struct HomeView_Previews: PreviewProvider{
-    static var previews: some View{
-        HomeView()
-    }
+#Preview {
+    HomeView()
 }
 
