@@ -12,11 +12,15 @@ struct HomeView: View {
     @State private var selectedTab: Tab = .all
     var body: some View {
         NavigationStack {
-            ScrollView{
-                VStack{
-                    MostReadView()
-                    SegmentedControl(selectedTab: $selectedTab)
-                    BookView(selectedTab: $selectedTab)
+            CustomNavView(title: "Hi Tharusha", profileImage: .pro){
+                ScrollView{
+                    VStack(spacing: 25){
+                        MostReadView()
+                        SegmentedControl(selectedTab: $selectedTab)
+                        BookView(selectedTab: $selectedTab)
+                    }
+                    .safeAreaPadding(.horizontal, 16)
+                    .safeAreaPadding(.top, 26)
                 }
             }
         }
