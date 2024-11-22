@@ -19,6 +19,7 @@ struct HomeView: View {
                         SegmentedControl(selectedTab: $selectedTab)
                         BookView(selectedTab: $selectedTab)
                     }
+                    .ignoresSafeArea(.all)
                     .safeAreaPadding(.horizontal, 16)
                     .safeAreaPadding(.top, 26)
                 }

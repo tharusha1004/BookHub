@@ -10,6 +10,8 @@ import Firebase
 import FirebaseAuth
 
 import LocalAuthentication
+import GoogleSignIn
+
 
 struct LoginRegisterView: View {
     
@@ -129,7 +131,7 @@ struct LoginRegisterView: View {
                     // Sign-in with Google, Facebook, and Apple
                     VStack(spacing: 12) {
                         Button {
-                            print("Sign in with Google")
+                            loginWithGoogle()
                         }label: {
                             HStack {
                                 Image(systemName: "globe")
@@ -266,6 +268,61 @@ struct LoginRegisterView: View {
             }
         }
     }
+    
+    private func loginWithGoogle() {
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            print("Failed to get Firebase client ID")
+            return
+        }
+
+        // Create a GIDConfiguration
+//        let config = GIDConfiguration(clientID: clientID)
+
+        // Perform the sign-in
+        GIDSignIn.sharedInstance.signIn(withPresenting: getRootViewController()) { signInResult, error in
+            if let error = error {
+                print("Failed to login with Google: \(error.localizedDescription)")
+                return
+            }
+
+            // Retrieve the Google user authentication and ID token
+            guard let signInResult = signInResult,
+                  let idToken = signInResult.user.idToken?.tokenString else {
+                print("Failed to retrieve Google ID token")
+                return
+            }
+
+            // Access the access token directly (since it's non-optional)
+            let accessToken = signInResult.user.accessToken.tokenString
+
+            // Create Firebase credentials using Google authentication tokens
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+
+            // Authenticate with Firebase
+            Auth.auth().signIn(with: credential) { result, error in
+                if let error = error {
+                    print("Failed to authenticate with Firebase: \(error.localizedDescription)")
+                    return
+                }
+
+                // Successfully signed in
+                print("User is signed in with Google: \(result?.user.uid ?? "")")
+            }
+        }
+    }
+
+
+    
+    private func getRootViewController() -> UIViewController {
+        guard let screen = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            fatalError("Unable to get UIWindowScene")
+        }
+        
+        guard let root = screen.windows.first?.rootViewController else {
+            fatalError("Unable to get rootViewController")
+        }
+        return root
+    }
 }
 
 struct LoginRegisterView_Previews: PreviewProvider{
@@ -275,4 +332,5 @@ struct LoginRegisterView_Previews: PreviewProvider{
         LoginRegisterView(isUserCurrentlyLoggedOut: $isUserCurrentlyLoggedOut, isAuthenticated: $isAuthenticated)
     }
 }
+
 

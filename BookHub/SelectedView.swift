@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct SelectedView: View {
     
     var theBook: Book
     @State var showStory = false
+    @State var showMap = false
+    @StateObject var delegte = NotificationDelegate()
     
     var body: some View {
         
@@ -60,29 +63,74 @@ struct SelectedView: View {
                 .padding(.bottom, 60)
                 .background(.ultraThinMaterial)
                 .frame(maxHeight: .infinity, alignment: .bottom)
-                .overlay(alignment: .bottom){
-                    Button(action:{
-                        withAnimation{
-                            showStory.toggle()
-                        }
-                    }, label: {
-                        Text("Start Reading").bold()
-                            .frame(width: 250, height: 50)
-                            .background(.white, in: .capsule)
-                            .foregroundStyle(.black)
-                    })
-                    .padding(.bottom,25)
+                .overlay(alignment: .bottom) {
+                    HStack {
+                        // Start Reading Button on the left
+                        Button(action: {
+                            withAnimation {
+                                showStory.toggle()
+                            }
+                        }, label: {
+                            Text("Start Reading").bold()
+                                .frame(width: 150, height: 50)
+                                .background(.white, in: .capsule)
+                                .foregroundStyle(.black)
+                        })
+                        
+                        Spacer() // Space between the buttons
+                        
+                        // View Location Button on the right
+                        Button(action: {
+                            showMap.toggle()
+                        }, label: {
+                            Text("View Location")
+                                .font(.headline)
+                                .frame(width: 150, height: 50)
+                                .background(.blue, in: .capsule)
+                                .foregroundColor(.white)
+                        })
+                    }
+                    .padding(.horizontal, 25) // Add padding to keep buttons away from screen edges
+                    .padding(.bottom, 25)    // Bottom padding for alignment
                 }
             }
+            .overlay(
+                // Download Now Button
+                Button(action:{
+                    createNotification()
+                }, label: {
+                    HStack{
+                        Image(systemName: "icloud.and.arrow.down")
+                            .font(.title2)
+                        Text("Download Book")
+                            .font(.headline)
+                            .bold()
+                    }
+                    .padding(10)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .shadow(radius: 5)
+                    .frame(alignment: .topTrailing)
+                })
+                .onAppear(perform: {
+                    UNUserNotificationCenter.current().requestAuthorization(options:
+                        [.alert, .badge, .sound]) { (_, _) in
+                    }
+                    UNUserNotificationCenter.current().delegate = delegte
+                })
+            )
             .fullScreenCover(isPresented: $showStory, content: {
                 StoryView(book: theBook)
             })
+            .sheet(isPresented: $showMap){
+                SearchableMap()
+            }
+            
+            
         }action: {
             //
         }
         .ignoresSafeArea()
-        
-        
     }
 }
 
@@ -96,3 +144,33 @@ struct line: View {
             .frame(width: 1, height: 35)
     }
 }
+
+// for in-app notifications
+class NotificationDelegate: NSObject, ObservableObject, UNUserNotificationCenterDelegate {
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.badge, .banner, .sound])
+    }
+}
+
+func createNotification() {
+    print("Creating notification...")
+    let content = UNMutableNotificationContent()
+    content.title = "Notification"
+    content.subtitle = "Your Download is completed"
+    
+    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+    let request = UNNotificationRequest(identifier: "IN-APP", content: content, trigger: trigger)
+    
+    UNUserNotificationCenter.current().add(request) { error in
+        if let error = error {
+            print("Error adding notification: \(error.localizedDescription)")
+        } else {
+            print("Notification added successfully!")
+        }
+    }
+}
+
+// create notifications..
+
+// getting access for notifications
