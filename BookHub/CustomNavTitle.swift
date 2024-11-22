@@ -12,12 +12,13 @@ struct NavHeader: View {
     var title: String
     var profileImage: ImageResource
     var body: some View {
-        ZStack{
+        ZStack(alignment: .top){
             Color.clear
                 .frame(height: interpolatedHeight())
                 .background(.ultraThinMaterial.opacity(opastyview()))
                 .blur(radius: 0.5)
                 .edgesIgnoringSafeArea(.top)
+            
             HStack{
                 NavigationLink(destination: NotificationView()) {
                     Image(systemName: "bell.badge").renderingMode(.template)
@@ -30,8 +31,13 @@ struct NavHeader: View {
                     .font(.system(size: interpolatedOText()))
                     .offset(x: 10)
                 Spacer()
-                Image(profileImage).resizable().scaledToFill()
-                    .frame(width: ProImage(), height: ProImage())
+                NavigationLink(destination: ProfileView()) { // Link to ProfileView
+                    Image(profileImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: ProImage(), height: ProImage())
+                        .cornerRadius(100)
+                }
             }
             .offset(y:PushupOffset())
             .padding()
