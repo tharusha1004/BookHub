@@ -6,16 +6,30 @@
 //
 
 import SwiftUI
-
+import Firebase
+ 
 struct ContentView: View {
+     
+    @State private var isUserCurrentlyLoggedOut: Bool = false
+    @State private var isAuthenticated: Bool = false
+     
     var body: some View {
-        VStack {
-            Text("BookHub").bold()
+        NavigationView {
+            if self.isUserCurrentlyLoggedOut {
+                HomeView()
+            }
+            else if isAuthenticated {
+                HomeView()
+            }
+            else {
+                LoginRegisterView(isUserCurrentlyLoggedOut: $isUserCurrentlyLoggedOut, isAuthenticated: $isAuthenticated)
+            }
         }
-        .padding()
     }
 }
-
-#Preview {
-    ContentView()
+ 
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
