@@ -12,12 +12,7 @@ struct NavHeader: View {
     var title: String
     var profileImage: ImageResource
     var body: some View {
-        ZStack(alignment: .top){
-            Color.clear
-                .frame(height: interpolatedHeight())
-                .background(.ultraThinMaterial.opacity(opastyview()))
-                .blur(radius: 0.5)
-                .edgesIgnoringSafeArea(.top)
+        ZStack{
             
             HStack{
                 NavigationLink(destination: NotificationView()) {
@@ -46,8 +41,8 @@ struct NavHeader: View {
     }
     
     private func interpolatedHeight() -> CGFloat {
-        let startHeight: CGFloat = 110
-        let endHeight: CGFloat = 95
+        let startHeight: CGFloat = 60
+        let endHeight: CGFloat = 30
         let transitionOffset: CGFloat = 35
         let progress = min(max(scrollOffset / transitionOffset, 0), 1)
         return endHeight + (startHeight - endHeight) * progress

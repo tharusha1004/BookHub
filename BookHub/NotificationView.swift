@@ -1,99 +1,114 @@
-////
-////  NotificationView.swift
-////  BookHub
-////
-////  Created by mac on 2024-11-20.
-////
-//
+///
+/// NotificationView.swift
+///  BookHub
+///
+/// Created by mac on 2024-11-20.
+///
+
 import SwiftUI
 
-struct NotificationView: View {
-    //    
-    //    //View Properties
-    //    @State private var searchText: String = ""
-    //    @State private var activeSearch: CustomSearchTab = .all
-    //    
-    //    // View
-    var body: some View {
-        Text("Hello, World!")
-        //        ScrollView(.vertical){
-        //            LazyVStack(spacing: 15){
-        //                DummyMessageView()
-        //            }
-        //            .safeAreaPadding(15)
-        //            .safeAreaInset(edge: .top, spacing: 0){
-        //                ExpandableNavigation()
-        //            }
-        //        }
-        //        .background(.gray.opacity(0.15))
+struct NotificationView: View{
+    
+    //MARK: Properties
+    @State private var selectedTab: String = "All"
+    
+    //MARK: Initialize the Notifications
+    @State private var notifications: [Notification] = [
+        Notification(id: 1, title: "New Book Arrived", message: "New book arrived. Ready to read", time: "11:00 AM", isRead: false),
+        Notification(id: 2, title: "New Feature Added", message: "Now you can get notes from each page", time: "07:42 PM", isRead: true),
+        Notification(id: 3, title: "New Book Arrived", message: "New book arrived. Ready to read", time: "02:12 PM", isRead: false),
+        Notification(id: 4, title: "New Book Arrived", message: "New book arrived. Ready to read", time: "09:47 AM", isRead: true),
+        Notification(id: 5, title: "New Message", message: "New message from John Fernando", time: "05:00 PM", isRead: true),
+        Notification(id: 6, title: "Membership Expired", message: "Your membership plan expired soon. Please Check", time: "08:18 PM", isRead: false),
+        Notification(id: 7, title: "New Book Arrived", message: "New book arrived. Ready to read", time: "12:00 AM", isRead: true),
+        Notification(id: 8, title: "New Message", message: "New message from Jagath Fernando", time: "04:38 AM", isRead: true)
+    ]
+    
+    var body: some View{
+        VStack(alignment: .leading){
+            
+            // Heading
+            Text("Notifications")
+            .font(.title)
+            .fontWeight(.bold)
+            .padding()
+            
+            // Picker Tabs
+            Picker("Filter", selection: $selectedTab){
+                Text("All").tag("All")
+                Text("Read").tag("Read")
+                Text("Unread").tag("Unread")
+                Text("Important").tag("Important")
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal)
+            
+            // Notification List
+            List(filteredNotifications){ notifications in
+                HStack{
+                    //Notification Details
+                    VStack(alignment: .leading){
+                        Text(notifications.title).font(.headline)
+                        if !notifications.message.isEmpty{
+                            Text(notifications.message).font(.subheadline).foregroundColor(.gray)
+                        }
+                        Text(notifications.time).font(.caption).foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    
+                    //Button to toggle read / unread
+                    Button(notifications.isRead ? "Mark as Read": "Mark as Read"){
+                        toggleRead(notifications.id)
+                    }
+                    .font(.caption)
+                    .padding(5)
+                    .background(Color.blue.opacity(0.2))
+                    .cornerRadius(5)
+                    
+                    // Button to Delete
+                    Button(action:{ deleteNotification(notifications.id)}){
+                        Image(systemName: "trash").foregroundStyle(.red)
+                    }
+                }
+            }
+            .listStyle(PlainListStyle())
+        }
+        .padding(.top)
+    }
+    
+    // Filtered Notifications
+    var filteredNotifications: [Notification] {
+        if selectedTab == "Read" {
+            return notifications.filter{$0.isRead}
+        }else if selectedTab == "Unread" {
+            return notifications.filter({$0.isRead == false})
+        }
+        return notifications
+    }
+    
+    // Toggle Status
+    func toggleRead(_ id: Int){
+        if let index = notifications.firstIndex(where: {$0.id == id}){
+            notifications[index].isRead.toggle()
+        }
+    }
+    
+    // Delete Status
+    func deleteNotification(_ id: Int){
+        notifications.removeAll(where: {$0.id == id})
+    }
+    
+    //Notifications Model
+    struct Notification: Identifiable{
+        let id: Int
+        let title: String
+        let message: String
+        let time: String
+        var isRead: Bool
     }
 }
-//
-//    //Expandable Navigation Bar
-//    @ViewBuilder
-//    func ExpandableNavigation(_ title: String = "Messages") -> some View{
-//        VStack(spacing:10){
-//            //Title
-//            Text(title)
-//                .font(.largeTitle.bold())
-//                .frame(maxWidth: .infinity, alignment: .leading)
-//                .padding(.bottom, 10)
-//            
-//            //Search Bar
-//            HStack(spacing:12){
-//                Image(systemName: "magnifyingglass")
-//                    .font(.title3)
-//                
-//                TextField("Search for messages", text: $searchText)
-//            }
-//            .padding(.vertical, 10)
-//            .padding(.horizontal, 15)
-//            .frame(height: 45)
-//            .background{
-//                RoundedRectangle(cornerRadius: 25)
-//                    .fill(.background)
-//            }
-//            
-//            // Custm Segmented Picker
-//            ScrollView(.horizontal){
-//                HStack(spacing: 12){
-//                    ForEach(Tab.allCases, id: \.rawValue){ tab in
-//                        Button()
-//                    }
-//                }
-//            }
-//            .frame(height: 50)
-//        }
-//        .padding(.top, 25)
-//        .safeAreaPadding(.horizontal, 15)
-//        .padding(.bottom, 10)
-//    }
-//    
-//    // Dummy Message View
-//    @ViewBuilder
-//    func DummyMessageView() -> some View {
-//        ForEach(0..<20, id: \.self){ _ in
-//            HStack(spacing: 12){
-//                Circle()
-//                    .frame(width: 55, height: 55)
-//                
-//                VStack(alignment: .leading, spacing: 6, content: {
-//                    Rectangle()
-//                        .frame(width: 140, height: 8)
-//                    
-//                    Rectangle()
-//                        .frame(height: 8)
-//                    
-//                    Rectangle()
-//                        .frame(width:80, height: 8)
-//                })
-//            }
-//            .foregroundStyle(.gray.opacity(0.4))
-//            .padding(.horizontal, 15)
-//        }
-//    }
-//}
-//
+
+
 #Preview {
     NotificationView()
 }
